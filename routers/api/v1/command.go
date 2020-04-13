@@ -123,7 +123,7 @@ func GetProgress(c *gin.Context) {
      agentid := c.Query("agentid")
 
      command := command_service.Command{}
-     reply, err := command.GetProgress(taskid, agentid, c.Request.URL.Path)
+     reply, err := command.GetProgress(taskid, agentid)
      if err != nil {
 	return
      }
@@ -154,6 +154,7 @@ func GetCommands(c *gin.Context) {
 // @Success 200 {object} app.Response
 // @Failure 500 {object} app.Response
 // @Router /api/v1/startScan [get]
+/*
 func StartScan(c *gin.Context) {
      appG := app.Gin{C: c}
      agentid := c.Query("agentid")
@@ -168,6 +169,7 @@ func StartScan(c *gin.Context) {
 		"agentid": reply,
      })
 }
+*/
 
 // @Summary reboot the specialized agent 
 // @Produce  json

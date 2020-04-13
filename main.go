@@ -34,7 +34,7 @@ func init() {
         for _, command := range commands{
 	    c.AddFunc(command.ScanPeriod, func() {
                 fmt.Println(command.AgentId)
-		Command.StartScan(command.AgentId, command.ScanNet, "/api/v1/startScan")
+		Command.StartScan(command.AgentId, command.ScanNet, command.ConfigId)
 	    })
         }
 	go c.Start()

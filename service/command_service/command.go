@@ -36,7 +36,7 @@ type Data struct {
 type Command struct {
 }
 
-func (t *Command) GetProgress(taskid string, agentid string, path string) (string, error) {
+func GetProgress(taskid string, agentid string) (interface{}, error) {
      obj := make(map[string]interface{})
      obj["task"] = taskid
 
@@ -48,7 +48,7 @@ func (t *Command) GetProgress(taskid string, agentid string, path string) (strin
 
      dest_url := "http://"
      dest_url += agentid
-     dest_url += path
+     dest_url += "/api/v1/getProgress" 
 
      reader := bytes.NewReader(data)
      request, err := http.NewRequest("POST", dest_url, reader)
@@ -81,7 +81,65 @@ func (t *Command) GetProgress(taskid string, agentid string, path string) (strin
         return "",err
      }
 
-     return string(respBytes),nil
+     value := gjson.GetBytes(respBytes, "data.progress")
+     if(value.Int() == 100) {
+        gredis.SRem("TaskSet", taskid)
+        gredis.SAdd("TaskHistory", taskid)
+     }
+     return value.Int(),nil
+}
+
+func (t *Command) GetProgress(taskid string, agentid string) (interface{}, error) {
+     obj := make(map[string]interface{})
+     obj["task"] = taskid
+
+     data, err := json.Marshal(obj)
+     if(err != nil) {
+	     fmt.Println(err.Error())
+	     return "",err
+     }
+
+     dest_url := "http://"
+     dest_url += agentid
+     dest_url += "/api/v1/getProgress" 
+
+     reader := bytes.NewReader(data)
+     request, err := http.NewRequest("POST", dest_url, reader)
+     if(err != nil) {
+	     fmt.Println(err.Error())
+	     return "",err
+     }
+     request.Header.Set("Content-Type", "application/json;charset=UTF-8")
+
+     proxy, _ := url.Parse("http://127.0.0.1:8080")
+     transport := &http.Transport{
+           Proxy: http.ProxyURL(proxy),
+     }
+     client := &http.Client{
+          Transport: transport,
+     }
+
+
+     client.Transport = transport
+
+     resp, err := client.Do(request)
+     if(err != nil) {
+	     fmt.Println(err.Error())
+	     return "",err
+     }
+
+     respBytes, err := ioutil.ReadAll(resp.Body)
+     if err != nil {
+        fmt.Println(err.Error())
+        return "",err
+     }
+
+     value := gjson.GetBytes(respBytes, "data.progress")
+     if(value.Int() == 100) {
+        gredis.SRem("TaskSet", taskid)
+        gredis.SAdd("TaskHistory", taskid)
+     }
+     return value.Int(),nil
 }
 
 func (t *Command) AssetSearch(taskid string, agentid string, path string) (string, error) {
@@ -167,6 +225,17 @@ func (t *Command) GetTaskAttr(taskid string) (string, error) {
      return reply, nil
 }
 
+func (t *Command) GetTaskHistory() ([]string, error) {
+     reply, err := gredis.SMembers("TaskHistory")
+     if(err != nil) {
+	     fmt.Println(err.Error())
+	     return reply, err
+     }
+
+     return reply, nil
+}
+
+
 func (t *Command) GetTaskList() ([]string, error) {
      reply, err := gredis.SMembers("TaskSet")
      if(err != nil) {
@@ -208,7 +277,7 @@ func(t *Command) GetAgentMonitor(agentid string) (interface{}, error) {
         return "",err
      }
 
-     return respBytes,nil
+     return string(respBytes),nil
 }
 
 func(t *Command) RebootAgent(agentid string) (interface{}, error) {
@@ -245,7 +314,21 @@ func(t *Command) RebootAgent(agentid string) (interface{}, error) {
      return respBytes,nil
 }
 
-func(t *Command) StartScan(agentid string, ips string, path string) (string, error) {
+func(t *Command) StartScan(agentid string, ips string, configid string) (string, error) {
+     cur_task_id, err := gredis.Get(configid+"/"+agentid)
+     if(err != nil) {
+	     fmt.Println(err.Error())
+	     return "", err
+     }
+
+     if(cur_task_id != "") {
+	percent,_ := GetProgress(cur_task_id, agentid)
+	if(percent != 100) {
+           return "last task has not been finished",nil
+	}
+     }
+
+
      obj := make(map[string]interface{})
      asset := make(map[string]interface{})
 
@@ -263,7 +346,7 @@ func(t *Command) StartScan(agentid string, ips string, path string) (string, err
 
      dest_url := "http://"
      dest_url += agentid
-     dest_url += path 
+     dest_url += "/api/v1/startScan"
 
 
      request, err := http.NewRequest("POST", dest_url, reader)
@@ -304,13 +387,15 @@ func(t *Command) StartScan(agentid string, ips string, path string) (string, err
         return "",err
      }
 
-     fmt.Println(respData.Data.TaskId)
+     fmt.Println(respData)
      gredis.SAdd("TaskSet", respData.Data.TaskId)
 
      obj["AgentId"] = agentid
+     obj["ConfigId"] = configid
 
-     fmt.Println(string(data))
-     gredis.Set(respData.Data.TaskId, obj, 24*3600)
+     //fmt.Println(string(data))
+     gredis.Set(respData.Data.TaskId, obj, 7*24*3600)
+     gredis.Set(configid +"/" + agentid, respData.Data.TaskId, 70*24*3600)
 
 
      return respData.Data.TaskId, nil
