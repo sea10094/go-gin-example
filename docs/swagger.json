@@ -70,6 +70,36 @@
                 }
             }
         },
+        "/api/v1/getAgentMonitor": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get agent monitor info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "agent id",
+                        "name": "agentid",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/getProgress": {
             "get": {
                 "produces": [
@@ -142,6 +172,36 @@
                     "application/json"
                 ],
                 "summary": "get task list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/rebootAgent": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "reboot the specialized agent",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "agent id",
+                        "name": "agentid",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

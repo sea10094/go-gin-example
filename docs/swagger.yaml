@@ -55,6 +55,25 @@ paths:
           schema:
             $ref: '#/definitions/app.Response'
       summary: get agent list
+  /api/v1/getAgentMonitor:
+    get:
+      parameters:
+      - description: agent id
+        in: query
+        name: agentid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: get agent monitor info
   /api/v1/getProgress:
     get:
       parameters:
@@ -111,6 +130,25 @@ paths:
           schema:
             $ref: '#/definitions/app.Response'
       summary: get task list
+  /api/v1/rebootAgent:
+    get:
+      parameters:
+      - description: agent id
+        in: query
+        name: agentid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: reboot the specialized agent
   /api/v1/startScan:
     get:
       parameters:
