@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+        "github.com/robfig/cron"
 
 	"github.com/EDDYCJY/go-gin-example/models"
 	"github.com/EDDYCJY/go-gin-example/pkg/gredis"
@@ -13,6 +14,7 @@ import (
 	"github.com/EDDYCJY/go-gin-example/pkg/setting"
 	"github.com/EDDYCJY/go-gin-example/routers"
 	"github.com/EDDYCJY/go-gin-example/pkg/util"
+	"github.com/EDDYCJY/go-gin-example/service/command_service"
 )
 
 func init() {
@@ -21,6 +23,21 @@ func init() {
 	logging.Setup()
 	gredis.Setup()
 	util.Setup()
+
+        commands, err := models.GetCommands()
+        if(err != nil) {
+	     fmt.Println(err.Error())
+        }
+
+        c := cron.New()
+        Command := command_service.Command{}
+        for _, command := range commands{
+	    c.AddFunc(command.ScanPeriod, func() {
+                fmt.Println(command.AgentId)
+		Command.StartScan(command.AgentId, "127.0.0.1", "/api/v1/startScan")
+	    })
+        }
+	go c.Start()
 }
 
 // @title Golang Gin API

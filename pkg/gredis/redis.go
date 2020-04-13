@@ -39,6 +39,33 @@ func Setup() error {
 	return nil
 }
 
+// Add a member to set 
+func SAdd(key string, value string) error {
+	conn := RedisConn.Get()
+	defer conn.Close()
+
+	_, err := conn.Do("SADD", key, value)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Remove a member to set 
+func SRem(key string, value string) error {
+	conn := RedisConn.Get()
+	defer conn.Close()
+
+	_, err := conn.Do("SREM", key, value)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+
 // Set a key/value
 func Set(key string, data interface{}, time int) error {
 	conn := RedisConn.Get()
@@ -49,7 +76,7 @@ func Set(key string, data interface{}, time int) error {
 		return err
 	}
 
-	_, err = conn.Do("SET", key, value)
+	_, err = conn.Do("SET", key, string(value))
 	if err != nil {
 		return err
 	}
@@ -75,14 +102,28 @@ func Exists(key string) bool {
 	return exists
 }
 
-// Get get a key
-func Get(key string) ([]byte, error) {
+// Get all members from a set 
+func SMembers(key string) ([]string, error) {
 	conn := RedisConn.Get()
 	defer conn.Close()
 
-	reply, err := redis.Bytes(conn.Do("GET", key))
+	reply, err := redis.Strings(conn.Do("SMEMBERS", key))
 	if err != nil {
 		return nil, err
+	}
+
+	return reply, nil
+}
+
+
+// Get get a key
+func Get(key string) (string, error) {
+	conn := RedisConn.Get()
+	defer conn.Close()
+
+	reply, err := redis.String(conn.Do("GET", key))
+	if err != nil {
+		return reply, err
 	}
 
 	return reply, nil
