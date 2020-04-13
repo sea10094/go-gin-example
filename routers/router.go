@@ -38,6 +38,8 @@ func InitRouter() *gin.Engine {
 		apiv1.GET("/getTaskList", v1.GetTaskList)
 		apiv1.GET("/getTaskAttr", v1.GetTaskAttr)
 		apiv1.GET("/startScan", v1.StartScan)
+		apiv1.GET("/getAgentMonitor", v1.GetAgentMonitor)
+		apiv1.GET("/rebootAgent", v1.RebootAgent)
 		//apiv1.POST("/api/v1/StopScan", v1.StopScan)
 		apiv1.GET("/getProgress", v1.GetProgress)
 		apiv1.GET("/assetSearch", v1.AssetSearch)

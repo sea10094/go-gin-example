@@ -177,6 +177,74 @@ func (t *Command) GetTaskList() ([]string, error) {
      return reply, nil
 }
 
+func(t *Command) GetAgentMonitor(agentid string) (interface{}, error) {
+     dest_url := "http://"
+     dest_url += agentid
+     dest_url += ".control"
+     dest_url += "/api/agent_info"
+
+     request, err := http.NewRequest("GET", dest_url, nil)
+
+     proxy, _ := url.Parse("http://127.0.0.1:8080")
+     transport := &http.Transport{
+           Proxy: http.ProxyURL(proxy),
+     }
+     client := &http.Client{
+          Transport: transport,
+     }
+
+
+     client.Transport = transport
+
+     resp, err := client.Do(request)
+     if(err != nil) {
+	     fmt.Println(err.Error())
+	     return "",err
+     }
+
+     respBytes, err := ioutil.ReadAll(resp.Body)
+     if err != nil {
+        fmt.Println(err.Error())
+        return "",err
+     }
+
+     return respBytes,nil
+}
+
+func(t *Command) RebootAgent(agentid string) (interface{}, error) {
+     dest_url := "http://"
+     dest_url += agentid
+     dest_url += ".control"
+     dest_url += "/api/reboot"
+
+     request, err := http.NewRequest("GET", dest_url, nil)
+
+     proxy, _ := url.Parse("http://127.0.0.1:8080")
+     transport := &http.Transport{
+           Proxy: http.ProxyURL(proxy),
+     }
+     client := &http.Client{
+          Transport: transport,
+     }
+
+
+     client.Transport = transport
+
+     resp, err := client.Do(request)
+     if(err != nil) {
+	     fmt.Println(err.Error())
+	     return "",err
+     }
+
+     respBytes, err := ioutil.ReadAll(resp.Body)
+     if err != nil {
+        fmt.Println(err.Error())
+        return "",err
+     }
+
+     return respBytes,nil
+}
+
 func(t *Command) StartScan(agentid string, ips string, path string) (string, error) {
      obj := make(map[string]interface{})
      asset := make(map[string]interface{})

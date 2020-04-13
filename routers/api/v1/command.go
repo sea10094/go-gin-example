@@ -169,3 +169,43 @@ func StartScan(c *gin.Context) {
      })
 }
 
+// @Summary reboot the specialized agent 
+// @Produce  json
+// @Param agentid query string false "agent id"
+// @Success 200 {object} app.Response
+// @Failure 500 {object} app.Response
+// @Router /api/v1/rebootAgent [get]
+func RebootAgent(c *gin.Context) {
+     appG := app.Gin{C: c}
+     agentid := c.Query("agentid")
+     command := command_service.Command{}
+     reply, err := command.RebootAgent(agentid)
+     if err != nil {
+	return
+     }
+
+     appG.Response(http.StatusOK, e.SUCCESS, map[string]interface{}{
+		"agentid": reply,
+     })
+}
+
+
+// @Summary get agent monitor info 
+// @Produce  json
+// @Param agentid query string false "agent id"
+// @Success 200 {object} app.Response
+// @Failure 500 {object} app.Response
+// @Router /api/v1/getAgentMonitor [get]
+func GetAgentMonitor(c *gin.Context) {
+     appG := app.Gin{C: c}
+     agentid := c.Query("agentid")
+     command := command_service.Command{}
+     reply, err := command.GetAgentMonitor(agentid)
+     if err != nil {
+	return
+     }
+
+     appG.Response(http.StatusOK, e.SUCCESS, map[string]interface{}{
+		"agentid": reply,
+     })
+}
