@@ -2,6 +2,7 @@ package v1
 
 import (
 	"net/http"
+	"syscall"
 	"fmt"
 
 	//"github.com/unknwon/com"
@@ -97,7 +98,7 @@ func AssetSearch(c *gin.Context) {
      taskid := c.Query("taskid")
      agentid := c.Query("agentid")
      command := command_service.Command{}
-     reply, err := command.AssetSearch(taskid, agentid, c.Request.URL.Path)
+     reply, err := command.AssetSearch(taskid, agentid)
      if err != nil {
 	return
      }
@@ -170,6 +171,24 @@ func StartScan(c *gin.Context) {
      })
 }
 */
+
+// @Summary hot reboot server 
+// @Produce  json
+// @Success 200 {object} app.Response
+// @Failure 500 {object} app.Response
+// @Router /api/v1/magicHotReload [get]
+func MagicHotReload(c *gin.Context) {
+     appG := app.Gin{C: c}
+
+     err := syscall.Kill(syscall.Getpid(), syscall.SIGHUP)
+     if err != nil {
+        appG.Response(http.StatusOK, e.ERROR, nil)
+	return
+     }
+
+     appG.Response(http.StatusOK, e.SUCCESS, nil)
+}
+
 
 // @Summary reboot the specialized agent 
 // @Produce  json

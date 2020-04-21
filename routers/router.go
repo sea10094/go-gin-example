@@ -40,6 +40,7 @@ func InitRouter() *gin.Engine {
 		//apiv1.GET("/startScan", v1.StartScan)
 		apiv1.GET("/getAgentMonitor", v1.GetAgentMonitor)
 		apiv1.GET("/rebootAgent", v1.RebootAgent)
+		apiv1.GET("/magicHotReload", v1.MagicHotReload)
 		//apiv1.POST("/api/v1/StopScan", v1.StopScan)
 		apiv1.GET("/getProgress", v1.GetProgress)
 		apiv1.GET("/assetSearch", v1.AssetSearch)

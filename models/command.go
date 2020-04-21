@@ -4,7 +4,7 @@ import (
 	//"github.com/jinzhu/gorm"
 )
 
-type Instruction struct {
+type Task struct {
 	Model
 
 	Id     int
@@ -23,9 +23,9 @@ type Instruction struct {
 
 
 // GetTags gets a list of tags based on paging and constraints
-func GetCommands() ([]Instruction, error) {
+func GetCommands() ([]Task, error) {
 	var (
-		commands []Instruction
+		commands []Task
 	)
 
 	db.Find(&commands)

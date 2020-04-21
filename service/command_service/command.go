@@ -142,7 +142,7 @@ func (t *Command) GetProgress(taskid string, agentid string) (interface{}, error
      return value.Int(),nil
 }
 
-func (t *Command) AssetSearch(taskid string, agentid string, path string) (string, error) {
+func (t *Command) AssetSearch(taskid string, agentid string) (map[string]interface{}, error) {
      str := "taskid=" + taskid
      obj := make(map[string]interface{})
      obj["query"] = str
@@ -150,18 +150,18 @@ func (t *Command) AssetSearch(taskid string, agentid string, path string) (strin
      data, err := json.Marshal(obj)
      if(err != nil) {
 	     fmt.Println(err.Error())
-	     return "",err
+	     return nil,err
      }
 
      dest_url := "http://"
      dest_url += agentid
-     dest_url += path
+     dest_url += "/api/v1/assertSearch" 
 
      reader := bytes.NewReader(data)
      request, err := http.NewRequest("POST", dest_url, reader)
      if(err != nil) {
 	     fmt.Println(err.Error())
-	     return "",err
+	     return nil,err
      }
      request.Header.Set("Content-Type", "application/json;charset=UTF-8")
 
@@ -180,16 +180,27 @@ func (t *Command) AssetSearch(taskid string, agentid string, path string) (strin
      resp, err := client.Do(request)
      if(err != nil) {
 	     fmt.Println(err.Error())
-	     return "",err
+	     return nil,err
      }
 
      respBytes, err := ioutil.ReadAll(resp.Body)
      if err != nil {
         fmt.Println(err.Error())
-        return "",err
+        return nil,err
      }
 
-     return string(respBytes),nil
+     m, _ := gjson.ParseBytes(respBytes).Value().(map[string]interface{})
+     m_data := m["data"].(map[string]interface{})
+     m_ips := m_data["ips"].([]interface{})
+     for _,m_ip := range m_ips {
+         m_protocols := m_ip.(map[string]interface{})["protocols"].(map[string]interface{})
+         var array []map[string]interface{}
+         for _,v := range m_protocols {
+             array = append(array, v.(map[string]interface{}))
+         }
+         m_ip.(map[string]interface{})["protocols"] = array
+     }
+     return m,nil
 }
 
 func (t *Command) GetAgentList() (interface{}, error) {

@@ -11,6 +11,7 @@ require (
 	github.com/denisenkom/go-mssqldb v0.0.0-20190920000552-128d9f4ae1cd // indirect
 	github.com/dgrijalva/jwt-go v3.1.0+incompatible
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
+	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6 // indirect
 	github.com/gin-gonic/gin v1.6.2
 	github.com/go-ini/ini v1.32.1-0.20180214101753-32e4be5f41bb
 	github.com/go-openapi/spec v0.19.7 // indirect
@@ -42,5 +43,4 @@ require (
 	golang.org/x/tools v0.0.0-20200402223321-bcf690261a44 // indirect
 	google.golang.org/appengine v1.6.3 // indirect
 	gopkg.in/ini.v1 v1.47.0 // indirect
-	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
